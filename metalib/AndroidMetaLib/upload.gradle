@@ -1,0 +1,114 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+def String getProjectProperty(String propertyName) {
+    String prop = "null"
+    if (hasProperty(propertyName)) {
+        prop = this.properties[propertyName]
+    }
+    return prop
+}
+
+import java.text.SimpleDateFormat;
+
+def releaseDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+def releaseDate = releaseDateFormat.parse("15/03/2015");
+def releaseVersion = getProjectProperty('bintray.version')
+group = getProjectProperty('bintray.group.id')
+//project.ext.set("archivesBaseName", uploadProperties.getProperty("project.default.name"));
+archivesBaseName = getProjectProperty('project.default.name')
+version = releaseVersion
+
+
+bintray {
+    user = getProjectProperty('bintray.user')
+    key = getProjectProperty('bintray.apikey')
+    publish = true
+    configurations = ['archives']
+    pkg {
+        repo = getProjectProperty('bintray.repo.name')
+        name = getProjectProperty('bintray.group.id')
+        desc = getProjectProperty('bintray.repo.desc')
+        websiteUrl = getProjectProperty('github.url')
+        issueTrackerUrl = getProjectProperty('github.issues')
+        vcsUrl = getProjectProperty('github.git.url')
+        licenses = ["Apache-2.0"]
+        labels = ['android', 'fragments', 'view-pager', 'viewpager', 'paging']
+        publicDownloadNumbers = true
+        version {
+            name = releaseVersion
+            desc = getProjectProperty('bintray.version.desc')
+            released = releaseDate
+            vcsTag = releaseVersion
+            attributes = ['gradle-plugin': getProjectProperty('bintray.group.id') + ":" +
+                    getProjectProperty('bintray.group.id') + ":" +
+                    getProjectProperty('project.default.name')]
+        }
+    }
+}
+
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+
+            artifactId = getProjectProperty('project.default.name')
+            groupId = getProjectProperty('bintray.group.id')
+
+            project {
+
+                packaging 'aar'
+
+                // Add your description here
+                name getProjectProperty('bintray.repo.desc')
+                url getProjectProperty('github.url')
+
+                // Set your license
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id getProjectProperty('bintray.user')
+                        name getProjectProperty('project.author')
+                        email getProjectProperty('project.email')
+                    }
+                }
+                scm {
+                    connection getProjectProperty('github.git.url')
+                    developerConnection getProjectProperty('github.git.url')
+                    url getProjectProperty('github.url')
+
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+task findConventions << {
+    println project.getConvention()
+}

@@ -38,8 +38,9 @@ public enum ComponentState {
      * {@link PackageManager#COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED} and {@link
      * PackageManager#COMPONENT_ENABLED_STATE_DISABLED_USER}.<br>
      * <br>
-     * <p/>
+     * <p>
      * <b>NOTE</b> if using platform below 14,
+     * </p>
      */
     DISABLED(
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED, (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) ?

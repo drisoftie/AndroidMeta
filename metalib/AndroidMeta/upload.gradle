@@ -11,38 +11,54 @@ def String getProjectProperty(String propertyName) {
 
 import java.text.SimpleDateFormat;
 
+
+def authorName = "${getProjectProperty('project.author')}"
+def userName = "${getProjectProperty('bintray.user')}"
+
+def projectName = "${getProjectProperty('project.default.name')}"
+def projectContact = "${getProjectProperty('project.email')}"
+
+def bintrayRepoName = "${getProjectProperty('bintray.repo.name')}"
+def groupIdName = "${getProjectProperty('bintray.group.id')}"
+def repoDescr = "${getProjectProperty('bintray.repo.desc')}"
+def githubUrl = "${getProjectProperty('github.url')}"
+def issuesUrl = "${getProjectProperty('github.issues')}"
+def versioningUrl = "${getProjectProperty('github.git.url')}"
+def versionDescr = "${getProjectProperty('bintray.version.desc')}"
+
 def releaseDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 def releaseDate = releaseDateFormat.parse("15/03/2015");
-def releaseVersion = getProjectProperty('bintray.version')
-group = getProjectProperty('bintray.group.id')
+def releaseVersion = "${getProjectProperty('bintray.version')}";
+
+
+group = groupIdName
 //project.ext.set("archivesBaseName", uploadProperties.getProperty("project.default.name"));
-archivesBaseName = getProjectProperty('project.default.name')
+archivesBaseName = projectName
 version = releaseVersion
+description = repoDescr
 
 
 bintray {
-    user = getProjectProperty('bintray.user')
-    key = getProjectProperty('bintray.apikey')
+    user = userName
+    key = "${getProjectProperty('bintray.apikey')}"
     publish = true
     configurations = ['archives']
     pkg {
-        repo = getProjectProperty('bintray.repo.name')
-        name = getProjectProperty('bintray.group.id')
-        desc = getProjectProperty('bintray.repo.desc')
-        websiteUrl = getProjectProperty('github.url')
-        issueTrackerUrl = getProjectProperty('github.issues')
-        vcsUrl = getProjectProperty('github.git.url')
+        repo = bintrayRepoName
+        name = groupIdName
+        desc = repoDescr
+        websiteUrl = githubUrl
+        issueTrackerUrl = issuesUrl
+        vcsUrl = versioningUrl
         licenses = ["Apache-2.0"]
-        labels = ['android', 'fragments', 'view-pager', 'viewpager', 'paging']
+        labels = ['android', 'asynchronous', 'task', 'action', 'asynctask']
         publicDownloadNumbers = true
         version {
             name = releaseVersion
-            desc = getProjectProperty('bintray.version.desc')
+            desc = versionDescr
             released = releaseDate
             vcsTag = releaseVersion
-            attributes = ['gradle-plugin': getProjectProperty('bintray.group.id') + ":" +
-                    getProjectProperty('bintray.group.id') + ":" +
-                    getProjectProperty('project.default.name')]
+            attributes = [projectName: groupIdName + ":" + groupIdName + ":" + projectName]
         }
     }
 }
@@ -53,16 +69,20 @@ install {
         // This generates POM.xml with proper parameters
         pom {
 
-            artifactId = getProjectProperty('project.default.name')
-            groupId = getProjectProperty('bintray.group.id')
+            artifactId = projectName
+            groupId = groupIdName
+            version = releaseVersion
+            description repoDescr
 
             project {
 
                 packaging 'aar'
 
-                // Add your description here
-                name getProjectProperty('bintray.repo.desc')
-                url getProjectProperty('github.url')
+                artifactId = projectName
+                groupId = groupIdName
+                name projectName
+                description repoDescr
+                url githubUrl
 
                 // Set your license
                 licenses {
@@ -73,15 +93,15 @@ install {
                 }
                 developers {
                     developer {
-                        id getProjectProperty('bintray.user')
-                        name getProjectProperty('project.author')
-                        email getProjectProperty('project.email')
+                        id userName
+                        name authorName
+                        email projectContact
                     }
                 }
                 scm {
-                    connection getProjectProperty('github.git.url')
-                    developerConnection getProjectProperty('github.git.url')
-                    url getProjectProperty('github.url')
+                    connection versioningUrl
+                    developerConnection versioningUrl
+                    url githubUrl
 
                 }
             }
